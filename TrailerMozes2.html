@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YM Welkomstbord - Video Edition</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow: hidden;
+            background: black;
+        }
+
+        /* --- VIDEO ACHTERGROND --- */
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -5;
+            overflow: hidden;
+        }
+
+        #bgVideo {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover; /* Zorgt dat de video het hele scherm vult */
+        }
+
+        /* WATER ANIMATIE OVERLAY (SVG FILTER) */
+        .water-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            filter: url(#water);
+            opacity: 0.3; /* Subtiele extra beweging bovenop de video */
+            z-index: -4;
+            pointer-events: none;
+        }
+
+        /* MIST EFFECT */
+        .mist {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 40% 60%, rgba(255,255,255,0.08), transparent 60%),
+                radial-gradient(circle at 70% 40%, rgba(255,255,255,0.05), transparent 60%);
+            animation: mistMove 40s linear infinite;
+            z-index: -3;
+        }
+
+        /* LICHT EFFECT */
+        .light {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(255,230,180,0.15), transparent 60%);
+            animation: lightPulse 6s ease-in-out infinite;
+            z-index: -2;
+        }
+
+        @keyframes mistMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-30%); }
+        }
+
+        @keyframes lightPulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* --- DE INFORMATIEKAART --- */
+        .card {
+            background: rgba(20, 15, 10, 0.65);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 50px;
+            width: 70vw;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            z-index: 10;
+        }
+
+        h1 {
+            letter-spacing: 5px;
+            color: #d4c4a8;
+            text-transform: uppercase;
+            margin: 0;
+            font-size: 40px;
+        }
+
+        .divider {
+            width: 120px;
+            height: 2px;
+            background: #d4c4a8;
+            margin: 20px auto;
+        }
+
+        .event-title {
+            font-size: 32px;
+            margin-bottom: 40px;
+            line-height: 1.4;
+        }
+
+        .event-title strong {
+            color: white;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .box label {
+            display: block;
+            color: #d4c4a8;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .box span {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <svg style="position:absolute; width:0; height:0;">
+        <filter id="water">
+            <feTurbulence id="turb" type="fractalNoise" baseFrequency="0.01 0.02" numOctaves="2" seed="2" result="turbulence"/>
+            <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="30" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+    </svg>
+
+    <div class="video-container">
+        <video autoplay muted loop id="bgVideo">
+            <source src="moses9.mp4" type="video/mp4">
+            Je browser ondersteunt geen video.
+        </video>
+    </div>
+    
+    <div class="water-overlay"></div>
+    <div class="mist"></div>
+    <div class="light"></div>
+
+    <div class="card">
+        <h1>Yulfono Mshihoyo</h1>
+        <div class="divider"></div>
+
+        <div class="event-title">
+            <strong>EXODUS - De weg naar vrijheid</strong><br>
+            Wat de reis van Mozes ons leert over onze eigen strijd.
+        </div>
+
+        <div class="info">
+            <div class="box">
+                <label>Status</label>
+                <span id="status">Inloop</span>
+            </div>
+
+            <div class="box">
+                <label>Programma</label>
+                <span>19:00 - 21:00</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* WATER ANIMATIE SCRIPT (Beweegt het SVG filter) */
+        const turb = document.querySelector("#turb");
+        let frame = 0;
+
+        function animateWater() {
+            frame += 0.003;
+            turb.setAttribute("baseFrequency", `0.01 ${0.02 + frame}`);
+            requestAnimationFrame(animateWater);
+        }
+        animateWater();
+
+        /* STATUS TIMER (Verandert tekst na 15 minuten) */
+        setTimeout(() => {
+            document.getElementById("status").innerText = "De lezing is begonnen";
+            document.getElementById("status").style.color = "#ff453a"; // Subtiele rode kleur bij start
+        }, 900000); // 900.000 ms = 15 minuten
+    </script>
+
+</body>
+</html>
